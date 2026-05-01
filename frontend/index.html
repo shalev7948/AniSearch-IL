@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h1>AniSearch</h1>
+<div id="data"></div>
+
+<script>
+fetch("http://127.0.0.1:5000/api/latest")
+.then(r => r.json())
+.then(data => {
+    document.getElementById("data").innerHTML =
+        data.map(e => `
+            <div>
+                <img src="${e.image}" width="100"/>
+                ${e.title} - פרק ${e.episode}
+            </div>
+        `).join("")
+})
+</script>
+</body>
+</html>
