@@ -1,56 +1,35 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 import sqlite3
-import os
 
 app = Flask(__name__)
 
-DB = "database/anime.db"
+# 🔥 זה הפתרון ל-CORS
+CORS(app)
 
+DB = "anime.db"
 
 def query(q):
-    try:
-        conn = sqlite3.connect(DB)
-        c = conn.cursor()
-        c.execute(q)
-        data = c.fetchall()
-        conn.close()
-        return data
-    except Exception as e:
-        print("DB ERROR:", e)
-        return []
-
+    conn = sqlite3.connect(DB)
+    c = conn.cursor()
+    c.execute(q)
+    data = c.fetchall()
+    conn.close()
+    return data
 
 @app.route("/")
 def home():
     return "API is running"
 
-
 @app.route("/api/latest")
 def latest():
     rows = query("""
-        SELECT e.id, a.title, e.episode, a.image
+        SELECT a.id, a.title, e.episode, a.image
         FROM episodes e
         JOIN anime a ON e.anime_id = a.id
         ORDER BY e.id DESC
-        LIMIT 16
+        LIMIT 10
     """)
-
-    # אם אין נתונים → נחזיר דמו
-    if not rows:
-        return jsonify([
-            {
-                "id": 1,
-                "title": "Naruto",
-                "episode": 1,
-                "image": "https://via.placeholder.com/150"
-            },
-            {
-                "id": 2,
-                "title": "One Piece",
-                "episode": 1070,
-                "image": "https://via.placeholder.com/150"
-            }
-        ])
 
     return jsonify([
         {
@@ -60,7 +39,6 @@ def latest():
             "image": r[3]
         } for r in rows
     ])
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
