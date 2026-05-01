@@ -1,21 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <title>AniSearch</title>
+</head>
 <body>
+
 <h1>AniSearch</h1>
-<div id="data"></div>
+
+<div id="episodes"></div>
 
 <script>
-fetch("anisearch-il-production.up.railway.app")
-.then(r => r.json())
-.then(data => {
-    document.getElementById("data").innerHTML =
-        data.map(e => `
-            <div>
-                <img src="${e.image}" width="100"/>
-                ${e.title} - פרק ${e.episode}
-            </div>
-        `).join("")
-})
+fetch("https://anisearch-il-production.up.railway.app/api/latest")
+  .then(res => res.json())
+  .then(data => {
+    const container = document.getElementById("episodes");
+
+    data.forEach(ep => {
+      const div = document.createElement("div");
+
+      div.innerHTML = `
+        <h3>${ep.title}</h3>
+        <p>Episode: ${ep.episode}</p>
+        <img src="${ep.image}" width="150">
+        <hr>
+      `;
+
+      container.appendChild(div);
+    });
+  })
+  .catch(err => {
+    console.error("ERROR:", err);
+  });
 </script>
+
 </body>
 </html>
